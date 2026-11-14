@@ -168,8 +168,9 @@
         src = lib.fileset.toSource {
           root = ./.;
           fileset = lib.fileset.unions [
-            ./frp-todo.cabal
-            ./README.md
+            ./bezel.cabal
+            ./CHANGELOG.md
+            ./LICENSE
             ./src
             ./app
             ./test
@@ -211,14 +212,14 @@
         frp-todo = pkgs.haskell.lib.compose.overrideCabal (old: {
           buildTools = (old.buildTools or [ ]) ++ [ pkgs.makeBinaryWrapper ];
           postFixup = (old.postFixup or "") + ''
-            wrapProgram $out/bin/frp-todo ${
+            wrapProgram $out/bin/bezel ${
               lib.concatStringsSep " " (
                 lib.mapAttrsToList (name: value: "--set ${name} ${lib.escapeShellArg value}") runtimeEnv
                 ++ map (name: "--unset ${name}") runtimeUnset
               )
             }
           '';
-        }) (haskellPackages.callCabal2nix "frp-todo" src { });
+        }) (haskellPackages.callCabal2nix "bezel" src { });
 
         # Just the program: without the library and its documentation the
         # closure no longer drags in GHC.
@@ -229,7 +230,7 @@
 
         apps.default = {
           type = "app";
-          program = "${app}/bin/frp-todo";
+          program = "${app}/bin/bezel";
         };
 
         devShells.default = haskellPackages.shellFor {
